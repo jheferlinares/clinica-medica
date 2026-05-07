@@ -148,6 +148,38 @@ export async function createAppointment(appointmentData) {
   }
 }
 
+export async function deleteAppointment(id) {
+  if (!isConnected || !pool) {
+    const idx = memoryStore.findIndex(app => app.id == id);
+    if (idx !== -1) {
+      memoryStore.splice(idx, 1);
+      return true;
+    }
+    return false;
+  }
+  try {
+    const result = await pool.query('DELETE FROM citas WHERE id = $1 RETURNING id', [id]);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error('Error eliminando cita en PostgreSQL:', error.message);
+    throw error;
+  }
+}
+
+export async function deleteAllAppointments() {
+  if (!isConnected || !pool) {
+    memoryStore = [];
+    return true;
+  }
+  try {
+    await pool.query('DELETE FROM citas');
+    return true;
+  } catch (error) {
+    console.error('Error eliminando todas las citas:', error.message);
+    throw error;
+  }
+}
+
 export async function updateAppointmentStatus(id, status) {
   if (!isConnected || !pool) {
     const idx = memoryStore.findIndex(app => app.id == id);
@@ -232,4 +264,4 @@ initDatabase().then(connected => {
   console.log(connected ? '🚀 PostgreSQL inicializado correctamente' : '⚠️  PostgreSQL no disponible. Usando modo memoria.');
 });
 
-export default { initDatabase, testConnection, getAppointments, createAppointment, updateAppointmentStatus, getStats, healthCheck };
+export default { initDatabase, testConnection, getAppointments, createAppointment, updateAppointmentStatus, deleteAppointment, deleteAllAppointments, getStats, healthCheck };

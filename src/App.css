@@ -50,6 +50,11 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -65,6 +70,22 @@ body {
   to { transform: translateX(0); opacity: 1; }
 }
 
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes bounceIn {
+  0% { opacity: 0; transform: scale(0.7); }
+  60% { opacity: 1; transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 /* Scroll Animations */
 .section-animate {
   opacity: 0;
@@ -75,6 +96,33 @@ body {
 .section-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Stagger children animation when section becomes visible */
+.section-visible .service-card:nth-child(1) { animation: fadeInUp 0.5s ease 0.05s both; }
+.section-visible .service-card:nth-child(2) { animation: fadeInUp 0.5s ease 0.15s both; }
+.section-visible .service-card:nth-child(3) { animation: fadeInUp 0.5s ease 0.25s both; }
+.section-visible .service-card:nth-child(4) { animation: fadeInUp 0.5s ease 0.35s both; }
+.section-visible .service-card:nth-child(5) { animation: fadeInUp 0.5s ease 0.45s both; }
+.section-visible .service-card:nth-child(6) { animation: fadeInUp 0.5s ease 0.55s both; }
+
+.section-visible .testimonial-card:nth-child(1) { animation: fadeInUp 0.5s ease 0.1s both; }
+.section-visible .testimonial-card:nth-child(2) { animation: fadeInUp 0.5s ease 0.25s both; }
+.section-visible .testimonial-card:nth-child(3) { animation: fadeInUp 0.5s ease 0.4s both; }
+
+/* Stat card bounce on load */
+.stat-card {
+  animation: bounceIn 0.4s ease both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.15s; }
+.stat-card:nth-child(3) { animation-delay: 0.25s; }
+.stat-card:nth-child(4) { animation-delay: 0.35s; }
+.stat-card:nth-child(5) { animation-delay: 0.45s; }
+
+/* Modal scale in */
+.modal-content {
+  animation: scaleIn 0.25s ease both;
 }
 
 /* Header */
@@ -92,7 +140,34 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 1100;
+}
+
+.ham-line {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--neutral-dark);
+  border-radius: 2px;
+  transition: var(--transition);
+  transform-origin: center;
+}
+
+.ham-line.open:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.ham-line.open:nth-child(2) { opacity: 0; }
+.ham-line.open:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 .nav {
   display: flex;
@@ -465,6 +540,27 @@ body {
   gap: 24px;
 }
 
+@media (max-width: 600px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .service-details {
+    width: 100%;
+  }
+
+  .service-button {
+    margin-top: 4px;
+  }
+}
+
 .service-card {
   background: var(--white);
   border: 2px solid var(--primary-light);
@@ -548,6 +644,54 @@ body {
   overflow: hidden;
   box-shadow: var(--shadow);
   animation: fadeIn 0.8s ease;
+}
+
+@media (max-width: 640px) {
+  .pricing-table {
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .pricing-table .table-header {
+    display: none;
+  }
+
+  .pricing-table .table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border-bottom: none;
+  }
+
+  .pricing-table .table-row .service-name {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .pricing-table .table-row .price-cell {
+    font-size: 24px;
+  }
+
+  .pricing-table .table-row .includes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .pricing-table .table-row .includes-list li {
+    background: var(--primary-light);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin: 0;
+  }
 }
 
 .table-header {
@@ -987,6 +1131,18 @@ body {
     grid-template-columns: 1fr;
     gap: 40px;
   }
+
+  .hero-content {
+    text-align: center;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto 32px;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
   
   .hero-title {
     font-size: 36px;
@@ -1031,40 +1187,72 @@ body {
 }
 
 @media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .cta-button {
+    display: none;
+  }
+
   .header .container {
-    flex-direction: column;
-    gap: 16px;
+    flex-wrap: nowrap;
+    position: relative;
   }
-  
+
   .nav {
-    gap: 16px;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    box-shadow: var(--shadow-hover);
+    flex-direction: column;
+    padding: 16px 20px;
+    gap: 0;
+    z-index: 999;
+    border-top: 1px solid var(--primary-light);
+    animation: fadeIn 0.2s ease;
   }
-  
+
+  .nav.nav-open {
+    display: flex;
+  }
+
+  .nav a {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--primary-light);
+    font-size: 16px;
+  }
+
+  .nav a:last-child {
+    border-bottom: none;
+  }
+
   .hero-title {
     font-size: 28px;
   }
-  
+
   .hero-buttons {
     flex-direction: column;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .table-header,
   .table-row {
     grid-template-columns: 1fr;
     gap: 12px;
   }
-  
+
   .footer-bottom {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .footer-links {
     justify-content: center;
   }
@@ -1074,25 +1262,44 @@ body {
   .container {
     padding: 0 16px;
   }
-  
+
   .hero {
-    padding: 40px 0;
+    padding: 48px 0 32px;
+  }
+
+  .hero-title {
+    font-size: 26px;
+    line-height: 1.3;
+  }
+
+  .hero-subtitle {
+    font-size: 15px;
+  }
+
+  .hero-content {
+    text-align: center;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .primary-button, .secondary-button {
+    width: 100%;
+    justify-content: center;
+    padding: 14px 24px;
   }
   
   .services,
   .pricing,
   .appointment,
   .testimonials {
-    padding: 40px 0;
+    padding: 48px 0;
   }
   
   .appointment-form {
-    padding: 24px;
-  }
-  
-  .primary-button,
-  .secondary-button {
-    padding: 12px 24px;
+    padding: 24px 16px;
   }
   
   .doctor-image {
@@ -1100,58 +1307,71 @@ body {
   }
   
   .doctor-placeholder {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
   }
   
   .doctor-badge {
-    width: 40px;
-    height: 40px;
-    bottom: 15px;
-    right: 15px;
+    width: 36px;
+    height: 36px;
+    bottom: 10px;
+    right: 10px;
   }
   
   .doctor-info h4 {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .doctor-info p {
-    font-size: 14px;
+    font-size: 13px;
   }
   
   .doctor-stats {
-    gap: 20px;
+    gap: 16px;
   }
   
   .stat span {
-    font-size: 20px;
+    font-size: 18px;
+  }
+
+  .section-header h2 {
+    font-size: 24px;
+  }
+
+  .section-header p {
+    font-size: 15px;
   }
   
   .floating-card {
-    max-width: 120px;
-    padding: 12px;
+    max-width: 110px;
+    padding: 10px;
     position: relative;
-    margin: 10px auto;
     animation: none;
+  }
+
+  .floating-card h4 {
+    font-size: 18px;
+  }
+
+  .floating-card p {
+    font-size: 11px;
   }
   
   .floating-card-1,
   .floating-card-2,
   .floating-card-3 {
     position: relative;
-    top: auto;
-    right: auto;
-    bottom: auto;
-    left: auto;
-    margin: 10px auto;
+    top: auto; right: auto; bottom: auto; left: auto;
+    margin: 6px;
   }
   
   .floating-elements {
     position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
   }
 }
 /* Doctor View Styles */
@@ -1300,6 +1520,207 @@ body {
   background: var(--white);
   box-shadow: var(--shadow);
   padding: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.doctor-header h1 {
+  font-size: 20px;
+  color: var(--neutral-dark);
+}
+
+.doctor-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.stat-card {
+  background: var(--white);
+  padding: 20px 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.stat-card.today {
+  border-left: 4px solid var(--primary);
+}
+
+.stat-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.stat-content h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-content p {
+  font-size: 13px;
+  color: var(--neutral-gray);
+  margin: 0;
+}
+
+.appointments-section {
+  margin-bottom: 40px;
+}
+
+.appointments-section h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+  color: var(--neutral-dark);
+}
+
+.appointments-table {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.appointments-table .table-header {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 1fr;
+  background: var(--primary);
+  color: var(--white);
+  padding: 14px 20px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.appointments-table .table-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 1fr;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--primary-light);
+  align-items: center;
+  transition: var(--transition);
+  font-size: 14px;
+}
+
+.appointments-table .table-row:hover {
+  background: var(--primary-light);
+}
+
+.patient-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.patient-info strong {
+  color: var(--neutral-dark);
+  font-size: 14px;
+}
+
+.patient-info small {
+  color: var(--neutral-gray);
+  font-size: 12px;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-badge.status-pendiente {
+  background: #FFF3CD;
+  color: #856404;
+}
+
+.status-badge.status-confirmada {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.status-badge.status-cancelada {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.action-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.action-btn:hover {
+  transform: scale(1.2);
+}
+
+.action-btn.delete:hover {
+  filter: brightness(0.8);
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .appointments-table .table-header {
+    display: none;
+  }
+
+  .appointments-table .table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    margin: 8px;
+    box-shadow: var(--shadow);
+    border-bottom: none;
+    background: var(--white);
+  }
+
+  .appointments-table .table-row:hover {
+    background: var(--primary-light);
+  }
+
+  .patient-info strong {
+    font-size: 15px;
+  }
+
+  .actions {
+    justify-content: flex-start;
+    margin-top: 4px;
+  }
+
+  .doctor-header h1 {
+    font-size: 16px;
+  }
 }
 
 .header-content {
@@ -1772,90 +2193,57 @@ body {
 
 /* Mobile Text Centering */
 @media (max-width: 768px) {
-  /* Center all text on mobile */
   .hero-title,
   .hero-subtitle,
   .section-header h2,
   .section-header p,
-  .service-card h3,
-  .service-details,
-  .doctor-info h4,
-  .doctor-info p,
-  .testimonial-text,
-  .testimonial-author h4,
-  .testimonial-author p,
-  .footer-section h4,
-  .footer-section p,
-  .footer-bottom p,
   .appointment-info h2,
-  .appointment-info p,
-  .info-card h4,
-  .info-card p,
-  .modal-header h2,
-  .service-description,
-  .service-details-section h4,
-  .info-item h5,
-  .info-item p,
-  .login-header h1,
-  .login-header p,
-  .dashboard-header h2,
-  .date-info,
-  .patient-cell strong,
-  .patient-cell small,
-  .stat-card h3,
-  .stat-number,
-  .quick-actions h3,
-  .action-card span,
-  .doctor-footer p {
-    text-align: center !important;
-  }
-  
-  /* Center align doctor info */
-  .header-left {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-  
-  .header-right {
-    flex-direction: column;
-    gap: 12px;
+  .appointment-info p {
     text-align: center;
   }
-  
-  .doctor-info {
+
+  .appointment-wrapper {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .appointment-form {
+    padding: 24px 16px;
+  }
+
+  .info-card {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .time-slots {
+    justify-content: center;
+  }
+
+  .submit-button {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
     text-align: center;
   }
-  
-  /* Center table content on mobile */
-  .appointment-row > div {
-    text-align: center;
+
+  .social-links {
     justify-content: center;
   }
-  
-  .patient-cell {
-    justify-content: center;
+
+  .footer-section a {
+    display: inline-block;
   }
-  
-  .status-cell {
-    justify-content: center;
-  }
-  
-  .actions-cell {
-    justify-content: center;
-  }
-  
-  /* Center modal content */
+
   .modal-body {
-    text-align: center;
+    padding: 20px;
   }
-  
-  .service-details-list li {
-    justify-content: center;
-  }
-  
+
   .service-info-grid {
-    text-align: center;
+    grid-template-columns: 1fr 1fr;
   }
 }
 /* Appointment Details Modal */
@@ -2051,84 +2439,22 @@ body {
 
 /* Mobile Text Centering - Enhanced */
 @media (max-width: 768px) {
-  /* Center all text and elements on mobile */
-  .hero-content,
-  .section-header,
-  .service-card,
-  .info-card,
-  .testimonial-card,
-  .footer-section,
-  .footer-bottom,
-  .appointment-info,
-  .appointment-form,
-  .modal-body,
-  .info-grid,
-  .notes-content,
-  .status-buttons,
-  .login-card,
-  .dashboard-header,
-  .appointments-table,
-  .dashboard-stats,
-  .quick-actions,
-  .doctor-footer {
-    text-align: center !important;
-  }
-  
-  /* Center align all flex containers */
-  .hero-buttons,
-  .services-grid,
-  .testimonials-grid,
-  .social-links,
-  .footer-links,
-  .time-slots,
-  .form-row,
-  .doctor-stats,
-  .header-content,
-  .header-left,
-  .header-right,
-  .actions-grid,
-  .status-buttons {
-    justify-content: center !important;
-  }
-  
-  /* Center table content */
-  .appointment-row > div,
-  .patient-cell,
-  .status-cell,
-  .actions-cell {
-    justify-content: center !important;
-    text-align: center !important;
-  }
-  
-  /* Center modal content */
-  .info-item {
-    justify-content: center;
+  .footer-bottom {
+    flex-direction: column;
     text-align: center;
   }
-  
-  .notes-content {
-    flex-direction: column;
-    align-items: center;
+
+  .footer-links {
+    justify-content: center;
   }
-  
-  /* Center doctor view elements */
-  .doctor-info {
-    text-align: center !important;
+
+  .login-form {
+    max-width: 360px;
+    margin: 0 auto;
+    width: 100%;
   }
-  
-  /* Ensure all text is centered */
-  h1, h2, h3, h4, h5, h6,
-  p, span, small, strong,
-  .hero-title, .hero-subtitle,
-  .service-card h3, .service-details,
-  .testimonial-text, .testimonial-author h4,
-  .footer-section p, .footer-bottom p,
-  .appointment-info p, .info-card p,
-  .modal-header h2, .service-description,
-  .login-header h1, .login-header p,
-  .dashboard-header h2, .date-info,
-  .stat-card h3, .stat-number,
-  .quick-actions h3, .action-card span {
-    text-align: center !important;
+
+  .doctor-login-page .container {
+    padding: 20px 16px;
   }
 }

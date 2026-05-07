@@ -23,6 +23,7 @@ function App() {
   const [showServiceModal, setShowServiceModal] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [visibleSections, setVisibleSections] = useState({})
+  const [menuOpen, setMenuOpen] = useState(false)
   
   const sectionRefs = useRef({})
 
@@ -56,13 +57,25 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setAppointments(data)
+        calcStats(data)
       }
     } catch (error) {
       console.error('Error loading appointments:', error)
-      // Fallback to localStorage
-      const localAppointments = JSON.parse(localStorage.getItem('clinica_appointments') || '[]')
-      setAppointments(localAppointments)
+      setAppointments([])
+      calcStats([])
     }
+  }
+
+  // Calculate stats from appointments array (instant, no extra API call)
+  const calcStats = (appts) => {
+    const today = new Date().toISOString().split('T')[0]
+    setStats({
+      total: appts.length,
+      confirmed: appts.filter(a => a.status === 'Confirmada').length,
+      pending: appts.filter(a => a.status === 'Pendiente').length,
+      cancelled: appts.filter(a => a.status === 'Cancelada').length,
+      today: appts.filter(a => (a.date || a.appointment_date) === today).length
+    })
   }
 
   // Load stats for doctor view
@@ -100,21 +113,32 @@ function App() {
         body: JSON.stringify({ status: newStatus })
       })
       if (response.ok) {
-        setAppointments(prev => prev.map(app =>
-          (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
-        ))
+        setAppointments(prev => {
+          const updated = prev.map(app =>
+            (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+          )
+          calcStats(updated)
+          return updated
+        })
         loadStats()
       } else {
-        // Fallback: update local state only
-        setAppointments(prev => prev.map(app =>
-          (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
-        ))
+        setAppointments(prev => {
+          const updated = prev.map(app =>
+            (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+          )
+          calcStats(updated)
+          return updated
+        })
       }
     } catch (error) {
       console.error('Error updating status:', error)
-      setAppointments(prev => prev.map(app =>
-        (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
-      ))
+      setAppointments(prev => {
+        const updated = prev.map(app =>
+          (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+        )
+        calcStats(updated)
+        return updated
+      })
     }
   }
 
@@ -300,6 +324,56 @@ function App() {
     }
   }
 
+  const deleteAppointment = async (appointmentId) => {
+    if (!confirm('¿Eliminar esta cita?')) return
+    try {
+      await fetch(`/api/appointments/${appointmentId}`, { method: 'DELETE' })
+    } catch (error) {
+      console.error('Error deleting appointment:', error)
+    }
+    setAppointments(prev => {
+      const updated = prev.filter(app => (app.id || app.localId) !== appointmentId)
+      calcStats(updated)
+      return updated
+    })
+  }
+
+  const handleServiceClick = (service) => {
+    setSelectedService(service)
+    setShowServiceModal(true)
+  }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            setVisibleSections(prev => ({
+              ...prev,
+              [entry.target.id]: true
+            }))
+          }
+        })
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    )
+    const sections = ['services', 'pricing', 'appointment', 'testimonials', 'contact']
+    sections.forEach(sectionId => {
+      const element = document.getElementById(sectionId)
+      if (element) {
+        sectionRefs.current[sectionId] = element
+        observer.observe(element)
+      }
+    })
+    return () => {
+      sections.forEach(sectionId => {
+        if (sectionRefs.current[sectionId]) {
+          observer.unobserve(sectionRefs.current[sectionId])
+        }
+      })
+    }
+  }, [])
+
   // Determine which view to show based on URL pathname
   const isDoctorPath = window.location.pathname === '/doctor' || window.location.pathname.endsWith('/doctor')
 
@@ -420,15 +494,21 @@ function App() {
                   <div className="actions">
                     <button 
                       className="action-btn confirm"
-                      onClick={() => updateAppointmentStatus(appointment.id || appointment.patientName, 'Confirmada')}
+                      onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Confirmada')}
                     >
                       ✅
                     </button>
                     <button 
                       className="action-btn cancel"
-                      onClick={() => updateAppointmentStatus(appointment.id || appointment.patientName, 'Cancelada')}
+                      onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Cancelada')}
                     >
                       ❌
+                    </button>
+                    <button
+                      className="action-btn delete"
+                      onClick={() => deleteAppointment(appointment.id || appointment.localId)}
+                    >
+                      🗑️
                     </button>
                   </div>
                 </div>
@@ -439,47 +519,6 @@ function App() {
       </div>
     )
   }
-
-  const handleServiceClick = (service) => {
-    setSelectedService(service)
-    setShowServiceModal(true)
-  }
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setVisibleSections(prev => ({
-              ...prev,
-              [entry.target.id]: true
-            }))
-          }
-        })
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      }
-    )
-
-    const sections = ['services', 'pricing', 'appointment', 'testimonials', 'contact']
-    sections.forEach(sectionId => {
-      const element = document.getElementById(sectionId)
-      if (element) {
-        sectionRefs.current[sectionId] = element
-        observer.observe(element)
-      }
-    })
-
-    return () => {
-      sections.forEach(sectionId => {
-        if (sectionRefs.current[sectionId]) {
-          observer.unobserve(sectionRefs.current[sectionId])
-        }
-      })
-    }
-  }, [])
 
   const availableTimes = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00']
 
@@ -492,11 +531,16 @@ function App() {
             <span className="logo-icon">🏥</span>
             <h1>Clínica<span>Salud</span>Total</h1>
           </div>
-          <nav className="nav">
-            <a href="#services">Servicios</a>
-            <a href="#pricing">Precios</a>
-            <a href="#appointment">Citas</a>
-            <a href="#contact">Contacto</a>
+          <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Menu">
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`}></span>
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`}></span>
+            <span className={`ham-line ${menuOpen ? 'open' : ''}`}></span>
+          </button>
+          <nav className={`nav ${menuOpen ? 'nav-open' : ''}`}>
+            <a href="#services" onClick={() => setMenuOpen(false)}>Servicios</a>
+            <a href="#pricing" onClick={() => setMenuOpen(false)}>Precios</a>
+            <a href="#appointment" onClick={() => setMenuOpen(false)}>Citas</a>
+            <a href="#contact" onClick={() => setMenuOpen(false)}>Contacto</a>
           </nav>
           <button className="cta-button">
             <span className="button-icon">📞</span>
