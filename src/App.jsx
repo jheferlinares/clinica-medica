@@ -265,8 +265,34 @@ function App() {
       localAppointments.push(appointmentData)
       localStorage.setItem('clinica_appointments', JSON.stringify(localAppointments))
       
+      setIsSubmitted(true)
+      setTimeout(() => setIsSubmitted(false), 3000)
+      
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        service: '',
+        date: '',
+        time: '',
+        message: ''
+      })
+      
+      alert('📝 ¡Cita guardada localmente! (API no disponible). Te contactaremos pronto.')
+      
+    } catch (error) {
+      console.error('Error al agendar cita:', error)
+      alert('❌ Error al agendar la cita. Por favor, intenta nuevamente o contacta por teléfono: +1 (555) 123-4567')
+    }
+  }
+
+  const availableTimes = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00']
+
+  // Determine which view to show based on URL pathname
+  const isDoctorPath = window.location.pathname === '/doctor' || window.location.pathname.endsWith('/doctor')
+
   // Render doctor view
-  if (currentView === 'doctor') {
+  if (isDoctorPath) {
     if (!isAuthenticated) {
       return (
         <div className="doctor-login-page">
