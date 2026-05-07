@@ -26,13 +26,26 @@ function App() {
   
   const sectionRefs = useRef({})
 
-  // Check URL for doctor view
-  useEffect(() => {
+  // Function to check and set current view based on path
+  const checkRoute = () => {
     const path = window.location.pathname
-    if (path === '/doctor') {
+    console.log('Current path:', path) // Debug
+    if (path === '/doctor' || path.endsWith('/doctor')) {
       setCurrentView('doctor')
     } else {
       setCurrentView('home')
+    }
+  }
+
+  // Check URL for doctor view on mount and when URL changes
+  useEffect(() => {
+    checkRoute()
+    
+    // Listen for popstate events (back/forward buttons)
+    window.addEventListener('popstate', checkRoute)
+    
+    return () => {
+      window.removeEventListener('popstate', checkRoute)
     }
   }, [])
 
