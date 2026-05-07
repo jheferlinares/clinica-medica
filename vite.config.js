@@ -8,9 +8,11 @@ export default defineConfig(({ mode }) => {
   
   return {
     plugins: [react()],
-    // Definir variables de entorno para el cliente
+    // Definir variables de entorno para el cliente (solo VITE_*)
     define: {
-      'process.env': env
+      'process.env': {
+        NODE_ENV: JSON.stringify(mode)
+      }
     },
     // Configuración de build para producción
     build: {
