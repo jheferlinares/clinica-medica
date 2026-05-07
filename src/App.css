@@ -1599,7 +1599,7 @@ body {
   box-shadow: var(--shadow);
 }
 
-.appointments-table .table-header {
+.appt-header {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 1fr;
   background: var(--primary);
@@ -1609,7 +1609,7 @@ body {
   font-size: 14px;
 }
 
-.appointments-table .table-row {
+.appt-row {
   display: grid;
   grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 1fr;
   padding: 14px 20px;
@@ -1619,23 +1619,51 @@ body {
   font-size: 14px;
 }
 
-.appointments-table .table-row:hover {
+.appt-row:last-child {
+  border-bottom: none;
+}
+
+.appt-row:hover {
   background: var(--primary-light);
 }
 
-.patient-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.patient-info strong {
-  color: var(--neutral-dark);
-  font-size: 14px;
-}
-
-.patient-info small {
+.appt-empty {
+  padding: 40px;
+  text-align: center;
   color: var(--neutral-gray);
-  font-size: 12px;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .appt-header {
+    display: none;
+  }
+
+  .appt-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 8px 12px;
+    padding: 16px;
+    margin: 8px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    border-bottom: none;
+    background: var(--white);
+  }
+
+  .appt-row:hover {
+    background: var(--primary-light);
+  }
+
+  .appt-row .patient-info {
+    grid-column: 1 / -1;
+  }
+
+  .appt-row .actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
 }
 
 .status-badge {

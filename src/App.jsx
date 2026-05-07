@@ -469,7 +469,7 @@ function App() {
           <div className="appointments-section">
             <h2>📋 Lista de Citas</h2>
             <div className="appointments-table">
-              <div className="table-header">
+              <div className="appt-header">
                 <div>Paciente</div>
                 <div>Servicio</div>
                 <div>Fecha</div>
@@ -477,8 +477,11 @@ function App() {
                 <div>Estado</div>
                 <div>Acciones</div>
               </div>
+              {appointments.length === 0 && (
+                <div className="appt-empty">No hay citas registradas.</div>
+              )}
               {appointments.map((appointment) => (
-                <div key={appointment.id || appointment.patientName} className="table-row">
+                <div key={appointment.id || appointment.localId || appointment.patientName} className="appt-row">
                   <div className="patient-info">
                     <strong>{appointment.patientName || appointment.patient_name}</strong>
                     <small>{appointment.patientEmail || appointment.patient_email}</small>
@@ -492,24 +495,18 @@ function App() {
                     </span>
                   </div>
                   <div className="actions">
-                    <button 
+                    <button
                       className="action-btn confirm"
                       onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Confirmada')}
-                    >
-                      ✅
-                    </button>
-                    <button 
+                    >✅</button>
+                    <button
                       className="action-btn cancel"
                       onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Cancelada')}
-                    >
-                      ❌
-                    </button>
+                    >❌</button>
                     <button
                       className="action-btn delete"
                       onClick={() => deleteAppointment(appointment.id || appointment.localId)}
-                    >
-                      🗑️
-                    </button>
+                    >🗑️</button>
                   </div>
                 </div>
               ))}
