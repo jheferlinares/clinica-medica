@@ -6,6 +6,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/appointments/:id",
+      "destination": "/api/appointments/[id]"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },

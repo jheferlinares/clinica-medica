@@ -94,13 +94,27 @@ function App() {
   // Update appointment status
   const updateAppointmentStatus = async (appointmentId, newStatus) => {
     try {
-      // For now, just update local state
-      setAppointments(prev => prev.map(app => 
-        app.id === appointmentId ? { ...app, status: newStatus } : app
-      ))
-      // In a real app, you'd make an API call to update the status
+      const response = await fetch(`/api/appointments/${appointmentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      if (response.ok) {
+        setAppointments(prev => prev.map(app =>
+          (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+        ))
+        loadStats()
+      } else {
+        // Fallback: update local state only
+        setAppointments(prev => prev.map(app =>
+          (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+        ))
+      }
     } catch (error) {
       console.error('Error updating status:', error)
+      setAppointments(prev => prev.map(app =>
+        (app.id || app.localId) === appointmentId ? { ...app, status: newStatus } : app
+      ))
     }
   }
 
@@ -286,8 +300,6 @@ function App() {
     }
   }
 
-  const availableTimes = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00']
-
   // Determine which view to show based on URL pathname
   const isDoctorPath = window.location.pathname === '/doctor' || window.location.pathname.endsWith('/doctor')
 
@@ -426,27 +438,6 @@ function App() {
         </div>
       </div>
     )
-  }
-
-      setIsSubmitted(true)
-      setTimeout(() => setIsSubmitted(false), 3000)
-      
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        service: '',
-        date: '',
-        time: '',
-        message: ''
-      })
-      
-      alert('📝 ¡Cita guardada localmente! (MongoDB no disponible). Te contactaremos pronto.')
-      
-    } catch (error) {
-      console.error('Error al agendar cita:', error)
-      alert('❌ Error al agendar la cita. Por favor, intenta nuevamente o contacta por teléfono: +1 (555) 123-4567')
-    }
   }
 
   const handleServiceClick = (service) => {
