@@ -1692,24 +1692,67 @@ body {
 .actions {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .action-btn {
   border: none;
-  background: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: var(--transition);
+  letter-spacing: 0.3px;
+}
+
+.action-btn.confirm {
+  background: #D1FAE5;
+  color: #065F46;
+}
+.action-btn.confirm:hover {
+  background: #059669;
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.action-btn.cancel {
+  background: #FEF3C7;
+  color: #92400E;
+}
+.action-btn.cancel:hover {
+  background: #D97706;
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.action-btn.delete {
+  background: #FEE2E2;
+  color: #991B1B;
+}
+.action-btn.delete:hover {
+  background: #DC2626;
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
   padding: 4px;
-  border-radius: var(--radius-sm);
+  line-height: 1;
+  color: var(--neutral-gray);
   transition: var(--transition);
 }
 
-.action-btn:hover {
-  transform: scale(1.2);
-}
-
-.action-btn.delete:hover {
-  filter: brightness(0.8);
+.password-toggle:hover {
+  color: var(--primary);
 }
 
 @media (max-width: 768px) {

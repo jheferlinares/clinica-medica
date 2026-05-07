@@ -24,6 +24,7 @@ function App() {
   const [selectedService, setSelectedService] = useState(null)
   const [visibleSections, setVisibleSections] = useState({})
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   
   const sectionRefs = useRef({})
 
@@ -98,7 +99,6 @@ function App() {
     if (doctorPassword === correctPassword) {
       setIsAuthenticated(true)
       loadAppointments()
-      loadStats()
     } else {
       alert('Contraseña incorrecta')
     }
@@ -120,7 +120,6 @@ function App() {
           calcStats(updated)
           return updated
         })
-        loadStats()
       } else {
         setAppointments(prev => {
           const updated = prev.map(app =>
@@ -389,12 +388,20 @@ function App() {
               <form onSubmit={handleDoctorLogin}>
                 <div className="password-input">
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="Contraseña"
                     value={doctorPassword}
                     onChange={(e) => setDoctorPassword(e.target.value)}
                     required
                   />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(v => !v)}
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
                 <button type="submit" className="login-button">
                   Ingresar
@@ -497,16 +504,19 @@ function App() {
                   <div className="actions">
                     <button
                       className="action-btn confirm"
+                      title="Confirmar"
                       onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Confirmada')}
-                    >✅</button>
+                    >Confirmar</button>
                     <button
                       className="action-btn cancel"
+                      title="Cancelar"
                       onClick={() => updateAppointmentStatus(appointment.id || appointment.localId, 'Cancelada')}
-                    >❌</button>
+                    >Cancelar</button>
                     <button
                       className="action-btn delete"
+                      title="Eliminar"
                       onClick={() => deleteAppointment(appointment.id || appointment.localId)}
-                    >🗑️</button>
+                    >Eliminar</button>
                   </div>
                 </div>
               ))}
