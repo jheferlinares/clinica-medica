@@ -2,23 +2,77 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 
 function App() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    service: '',
-    date: '',
-    time: '',
-    message: ''
-  })
-
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [activeService, setActiveService] = useState('general')
-  const [showServiceModal, setShowServiceModal] = useState(false)
-  const [selectedService, setSelectedService] = useState(null)
-  const [visibleSections, setVisibleSections] = useState({})
+  const [currentView, setCurrentView] = useState('home')
+  const [doctorPassword, setDoctorPassword] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [appointments, setAppointments] = useState([])
+  const [stats, setStats] = useState({ total: 0, confirmed: 0, pending: 0, cancelled: 0, today: 0 })
   
   const sectionRefs = useRef({})
+
+  // Check URL for doctor view
+  useEffect(() => {
+    const path = window.location.pathname
+    if (path === '/doctor') {
+      setCurrentView('doctor')
+    } else {
+      setCurrentView('home')
+    }
+  }, [])
+
+  // Load appointments for doctor view
+  const loadAppointments = async () => {
+    try {
+      const response = await fetch('/api/appointments')
+      if (response.ok) {
+        const data = await response.json()
+        setAppointments(data)
+      }
+    } catch (error) {
+      console.error('Error loading appointments:', error)
+      // Fallback to localStorage
+      const localAppointments = JSON.parse(localStorage.getItem('clinica_appointments') || '[]')
+      setAppointments(localAppointments)
+    }
+  }
+
+  // Load stats for doctor view
+  const loadStats = async () => {
+    try {
+      const response = await fetch('/api/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    }
+  }
+
+  // Handle doctor login
+  const handleDoctorLogin = (e) => {
+    e.preventDefault()
+    if (doctorPassword === 'clinica123') {
+      setIsAuthenticated(true)
+      loadAppointments()
+      loadStats()
+    } else {
+      alert('Contraseña incorrecta')
+    }
+  }
+
+  // Update appointment status
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    try {
+      // For now, just update local state
+      setAppointments(prev => prev.map(app => 
+        app.id === appointmentId ? { ...app, status: newStatus } : app
+      ))
+      // In a real app, you'd make an API call to update the status
+    } catch (error) {
+      console.error('Error updating status:', error)
+    }
+  }
 
   const services = [
     { 
@@ -181,6 +235,143 @@ function App() {
       localAppointments.push(appointmentData)
       localStorage.setItem('clinica_appointments', JSON.stringify(localAppointments))
       
+  // Render doctor view
+  if (currentView === 'doctor') {
+    if (!isAuthenticated) {
+      return (
+        <div className="doctor-login-page">
+          <div className="container">
+            <div className="login-form">
+              <h2>🏥 Panel Médico</h2>
+              <p>Ingresa la contraseña para acceder al panel de control</p>
+              <form onSubmit={handleDoctorLogin}>
+                <div className="password-input">
+                  <input
+                    type="password"
+                    placeholder="Contraseña"
+                    value={doctorPassword}
+                    onChange={(e) => setDoctorPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <button type="submit" className="login-button">
+                  Ingresar
+                </button>
+              </form>
+              <div className="password-hint">
+                <small>Contraseña por defecto: clinica123</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="doctor-view-page">
+        <div className="container">
+          <header className="doctor-header">
+            <h1>🏥 Panel de Control Médico</h1>
+            <button 
+              className="logout-button"
+              onClick={() => {
+                setIsAuthenticated(false)
+                setDoctorPassword('')
+                window.location.href = '/'
+              }}
+            >
+              Cerrar Sesión
+            </button>
+          </header>
+
+          {/* Stats Dashboard */}
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">📅</div>
+              <div className="stat-content">
+                <h3>{stats.total}</h3>
+                <p>Total Citas</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">✅</div>
+              <div className="stat-content">
+                <h3>{stats.confirmed}</h3>
+                <p>Confirmadas</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">⏳</div>
+              <div className="stat-content">
+                <h3>{stats.pending}</h3>
+                <p>Pendientes</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">❌</div>
+              <div className="stat-content">
+                <h3>{stats.cancelled}</h3>
+                <p>Canceladas</p>
+              </div>
+            </div>
+            <div className="stat-card today">
+              <div className="stat-icon">📆</div>
+              <div className="stat-content">
+                <h3>{stats.today}</h3>
+                <p>Citas Hoy</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Appointments Table */}
+          <div className="appointments-section">
+            <h2>📋 Lista de Citas</h2>
+            <div className="appointments-table">
+              <div className="table-header">
+                <div>Paciente</div>
+                <div>Servicio</div>
+                <div>Fecha</div>
+                <div>Hora</div>
+                <div>Estado</div>
+                <div>Acciones</div>
+              </div>
+              {appointments.map((appointment) => (
+                <div key={appointment.id || appointment.patientName} className="table-row">
+                  <div className="patient-info">
+                    <strong>{appointment.patientName || appointment.patient_name}</strong>
+                    <small>{appointment.patientEmail || appointment.patient_email}</small>
+                  </div>
+                  <div>{appointment.service}</div>
+                  <div>{appointment.date || appointment.appointment_date}</div>
+                  <div>{appointment.time || appointment.appointment_time}</div>
+                  <div>
+                    <span className={`status-badge status-${(appointment.status || 'Pendiente').toLowerCase()}`}>
+                      {appointment.status || 'Pendiente'}
+                    </span>
+                  </div>
+                  <div className="actions">
+                    <button 
+                      className="action-btn confirm"
+                      onClick={() => updateAppointmentStatus(appointment.id || appointment.patientName, 'Confirmada')}
+                    >
+                      ✅
+                    </button>
+                    <button 
+                      className="action-btn cancel"
+                      onClick={() => updateAppointmentStatus(appointment.id || appointment.patientName, 'Cancelada')}
+                    >
+                      ❌
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
       setIsSubmitted(true)
       setTimeout(() => setIsSubmitted(false), 3000)
       
