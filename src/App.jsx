@@ -8,6 +8,22 @@ function App() {
   const [appointments, setAppointments] = useState([])
   const [stats, setStats] = useState({ total: 0, confirmed: 0, pending: 0, cancelled: 0, today: 0 })
   
+  // Landing page states
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: '',
+    date: '',
+    time: '',
+    message: ''
+  })
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [activeService, setActiveService] = useState('general')
+  const [showServiceModal, setShowServiceModal] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
+  const [visibleSections, setVisibleSections] = useState({})
+  
   const sectionRefs = useRef({})
 
   // Check URL for doctor view
