@@ -68,7 +68,8 @@ function App() {
   // Handle doctor login
   const handleDoctorLogin = (e) => {
     e.preventDefault()
-    if (doctorPassword === 'clinica123') {
+    const correctPassword = import.meta.env.VITE_DOCTOR_PASSWORD || 'clinica123'
+    if (doctorPassword === correctPassword) {
       setIsAuthenticated(true)
       loadAppointments()
       loadStats()
@@ -275,7 +276,7 @@ function App() {
                 </button>
               </form>
               <div className="password-hint">
-                <small>Contraseña por defecto: clinica123</small>
+                <small>Ingresa la contraseña del panel médico</small>
               </div>
             </div>
           </div>

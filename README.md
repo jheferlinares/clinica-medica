@@ -102,7 +102,7 @@ clinica-medica/
 | Componente | URL | Descripción |
 |-----------|-----|-------------|
 | Frontend | http://localhost:5173 | Landing page principal |
-| Doctor View | http://localhost:5173/doctor | Panel médico (contraseña: `clinica123`) |
+| Doctor View | http://localhost:5173/doctor | Panel médico (requiere autenticación) |
 | Backend API | http://localhost:5000 | Servidor API |
 | API Health | http://localhost:5000/api/health | Verificar estado |
 
@@ -208,10 +208,10 @@ npm run preview           # Vista previa de producción
 
 ## 🔒 Seguridad
 
-- **Contraseña por defecto**: `clinica123` (cambiar en producción)
+- **Autenticación del panel médico**: Configurada con variable de entorno `VITE_DOCTOR_PASSWORD`
 - **Validación de datos**: En frontend y backend
 - **CORS configurado**: Solo para desarrollo local
-- **Variables de entorno**: Credenciales separadas del código
+- **Variables de entorno**: Credenciales separadas del código, nunca versionadas
 
 ## 🚨 Solución de Problemas
 
